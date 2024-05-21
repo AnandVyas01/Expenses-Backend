@@ -4,6 +4,7 @@ const {
   isAmountMissing,
   isCategoryMissing,
   isDateMissing,
+  isUserIdMissingFromParams,
 } = require("../utils/expensesUtil");
 const { NoAuth } = require("../utils/tokenVerificationError");
 
@@ -13,7 +14,7 @@ const checkAuthMiddleWare = (req, res, next) => {
   }
   if (!req.headers.authorization) {
     console.log("NOT AUTH. AUTH HEADER MISSING.");
-    return next(new NoAuth("Not Authenticated.")); //this returns contorl to app.js. 
+    return next(new NoAuth("Not Authenticated.")); //this returns contorl to app.js.
   }
   const extractedToken = req.headers.authorization.split(" ");
   if (extractedToken.length !== 2) {
@@ -61,4 +62,24 @@ const expenseCreateFieldsCheck = (req, res, next) => {
   }
 };
 
-module.exports = { checkAuthMiddleWare, expenseCreateFieldsCheck };
+const checkuserIdMissing = (req, res, next) => {
+  try {
+    if (isUserIdMissingFromParams(req)) {
+      throw new Error("user id is missing from request.");
+    }
+
+    req.body.userId = req.params.userId;
+    next();
+  } catch (error) {
+    res.status(statuses.VALIDATION_ERROS).json({
+      error: error.message,
+      message: statusMessages[statuses.VALIDATION_ERROS],
+    });
+  }
+};
+
+module.exports = {
+  checkAuthMiddleWare,
+  expenseCreateFieldsCheck,
+  checkuserIdMissing,
+};

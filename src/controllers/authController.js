@@ -1,3 +1,4 @@
+const expensesModel = require("../model/expenses");
 const users = require("../model/users");
 const {
   encryptPassword,
@@ -51,12 +52,31 @@ const loginController = async (req, res) => {
   }
 };
 
-const getUserDetailsController = (req, res) => {
-  res.status(statuses.OK).json({
-    message: "User found successfully",
-    data: req.user,
-    status: statusMessages[statuses.OK],
-  });
+const getUserDetailsController = async (req, res, next) => {
+  try {
+    const expenses = await expensesModel.aggregate([
+      {
+        $match: {
+          userId: req.user._id,
+        },
+      },
+      {
+        $group: {
+          _id: "$category", // Group by userId, or another appropriate field
+          totalAmount: { $sum: "$amount" }, // Sum the amount field
+        },
+      },
+    ]);
+
+    res.status(statuses.OK).json({
+      message: "User found successfully",
+      data: req.user,
+      amount: expenses,
+      status: statusMessages[statuses.OK],
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
