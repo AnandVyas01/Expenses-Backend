@@ -18,10 +18,15 @@ function isUserIdMissingFromParams(req) {
   return !!(req.params && !req.params.userId);
 }
 
+function isexpenseIdMissingFromParams(req) {
+  return !!(req.params && !req.params.expenseId);
+}
+
 module.exports = {
   isUserIdMissing,
   isAmountMissing,
   isCategoryMissing,
   isDateMissing,
-  isUserIdMissingFromParams
+  isUserIdMissingFromParams,
+  isexpenseIdMissingFromParams
 };
