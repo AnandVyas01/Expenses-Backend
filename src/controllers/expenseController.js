@@ -14,7 +14,10 @@ const createExpense = async (req, res, next) => {
 const listExpense = async (req, res, next) => {
   try {
     const userId = req.body.userId;
-    const list = await expensesModel.find({ userId }).select("date description category amount _id");
+    const list = await expensesModel
+      .find({ userId })
+      .select("date description category amount _id")
+      .sort({ date: -1 });
     res.status(201).json({ message: "Expense Added", data: list });
   } catch (error) {
     next(error);
